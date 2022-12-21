@@ -13,14 +13,16 @@ module.exports = {
         try {
 
             const user = await req.prisma.user.findFirst({
-                where: {email: email },
+                where: { email: email },
                 select: {
                     id: true,
                     firstName: true,
                     lastName: true,
                     email: true,
                     avatar: true,
-                    password: true
+                    password: true,
+                    businesses: true,
+                    store: true
                 }
             })
 
@@ -39,8 +41,11 @@ module.exports = {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                avatar: user.avatar
+                avatar: user.avatar,
+                businesses: user.businesses
             }
+
+            // console.log('User with businesses', tokenUser)
 
             const accessToken = jwtSignAccessToken(tokenUser, '1d')
             const refreshToken = jwtSignRefreshToken(tokenUser, '1y')
@@ -295,6 +300,7 @@ module.exports = {
                         avatar: true,
                         createdAt: true,
                         updatedAt: true,
+                        businesses: true
                     }
                 })
 

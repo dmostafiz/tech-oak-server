@@ -11,14 +11,14 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  email     String  @unique
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  email     String @unique
   firstName String
   lastName  String
   password  String
-  
-  phoneNo   String?
-  avatar    String?
+
+  phoneNo String?
+  avatar  String?
 
   // true, false
   isActive          Boolean? @default(false)
@@ -28,7 +28,117 @@ model User {
   isNew Boolean? @default(true)
   role  String?  @default("user")
 
+  // admin / sales / inventory / products / pos
+  business_role String @default("sales")
+
   verifiedAt DateTime?
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
+
+  businesses  Business[] @relation(name: "admin")
+  businessIds String[]   @db.ObjectId
+
+  store   Business? @relation(name: "operation", fields: [storeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  storeId String?   @db.ObjectId
+}
+
+model Business {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String?
+  phone    String?
+  location String?
+  city     String?
+  state    String?
+  zip      String?
+
+  // True / False
+  status Boolean @default(true)
+
+  // True / False
+  isDefault Boolean @default(true)
+
+  admin   User   @relation(name: "admin", fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adminId String @db.ObjectId
+
+  operators   User[]   @relation(name: "operation")
+  operatorIds String[] @db.ObjectId
+
+  categories Category[]
+  brands     Brand[]
+  units      Unit[]
+  variations Variation[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Brand {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String?
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  status Boolean @default(true)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Category {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String?
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  parent   Category @relation(name: "parent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId String   @db.ObjectId
+
+  children Category[] @relation(name: "parent")
+
+  status Boolean @default(true)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Unit {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  short_name    String?
+  allow_decimal Boolean @default(false)
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  isMultiple Boolean @default(false)
+
+  multipleNumber Int
+
+  multipleUnit   Unit   @relation(name: "multiple", fields: [multipleUnitId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  multipleUnitId String @db.ObjectId
+
+  multiples Unit[] @relation(name: "multiple")
+
+  status Boolean @default(true)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Variation {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  name   String?
+  values String[]
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  status Boolean @default(true)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
