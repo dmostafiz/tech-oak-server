@@ -31,15 +31,15 @@ model User {
   // admin / sales / inventory / products / pos
   business_role String @default("sales")
 
-  verifiedAt DateTime?
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
-
   businesses  Business[] @relation(name: "admin")
   businessIds String[]   @db.ObjectId
 
   store   Business? @relation(name: "operation", fields: [storeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   storeId String?   @db.ObjectId
+
+  verifiedAt DateTime?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
 }
 
 model Business {
