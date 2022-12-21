@@ -15,7 +15,6 @@ app.set('view engine', 'jade');
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://swift-inventory.vercel.app',
     'https://tech-oak.vercel.app',
     'https://tech-oak.com',
   ],
