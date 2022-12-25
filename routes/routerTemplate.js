@@ -3,4 +3,5 @@ var router = express.Router();
 
 
 
-module.exports = router
+const templateRoutes = router
+module.exports = templateRoutes

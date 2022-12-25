@@ -68,6 +68,11 @@ model Business {
   units      Unit[]
   variations Variation[]
 
+  suppliers Supplier[]
+  customers Customer[]
+  sales     Sale[]
+  purchase  Purchase[]
+
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
@@ -94,8 +99,10 @@ model Category {
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
 
-  parent   Category @relation(name: "parent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  parentId String   @db.ObjectId
+  isSubcategory Boolean @default(false)
+
+  parent   Category? @relation(name: "parent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId String?   @db.ObjectId
 
   children Category[] @relation(name: "parent")
 
@@ -106,22 +113,12 @@ model Category {
 }
 
 model Unit {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  short_name    String?
-  allow_decimal Boolean @default(false)
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  shortName String?
 
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
-
-  isMultiple Boolean @default(false)
-
-  multipleNumber Int
-
-  multipleUnit   Unit   @relation(name: "multiple", fields: [multipleUnitId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  multipleUnitId String @db.ObjectId
-
-  multiples Unit[] @relation(name: "multiple")
 
   status Boolean @default(true)
 
@@ -138,6 +135,106 @@ model Variation {
   businessId String   @db.ObjectId
 
   status Boolean @default(true)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Supplier {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  prefix            String?
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  mobile            String?
+  alternativeMobile String?
+  landLine          String?
+  email             String?
+  taxNumber         String?
+  addressOne        String?
+  addressTwo        String?
+  city              String?
+  state             String?
+  country           String?
+  zipCode           String?
+  purchases         Purchase[]
+
+  status Boolean @default(true)
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  description String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Customer {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  prefix            String?
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  mobile            String?
+  alternativeMobile String?
+  landLine          String?
+  email             String?
+  taxNumber         String?
+  addressOne        String?
+  addressTwo        String?
+  city              String?
+  state             String?
+  country           String?
+  zipCode           String?
+  sales             Sale[]
+
+  status Boolean @default(true)
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  description String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Sale {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  customer    Customer @relation(fields: [customerId], references: [id])
+  customerId  String   @db.ObjectId
+  quantity    Int
+  totalAmount Int
+  paid        Int
+  due         Int
+
+  status Boolean @default(true)
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  description String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Purchase {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  supplierId  String   @db.ObjectId
+  quantity    Int
+  totalAmount Int
+  paid        Int
+  due         Int
+
+  status Boolean @default(true)
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  description String?
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
