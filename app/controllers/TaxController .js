@@ -4,59 +4,59 @@ const brandController = {
 
     create: async (req, res) => {
         try {
-            consoleLog('brand body', req.body)
+            consoleLog('tax body', req.body)
             // consoleLog('category user business', req.business)
 
-            const { name, status, description } = req.body
+            const { name, rate } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
 
-            const brand = await req.prisma.brand.create({
+            const tax = await req.prisma.tax.create({
                 data: {
                     name: name,
-                    description: description,
-                    status: status == 'yes' ? true : false,
+                    rate: rate,
                     businessId: req?.business?.id,
                 }
             })
 
-            return res.json({ ok: true, brand })
+            return res.json({ ok: true, tax })
 
         } catch (error) {
-            consoleLog('brand create error', error)
+            consoleLog('tax create error', error)
             res.json({ ok: false })
         }
     },
 
-    getBrands: async (req, res) => {
+    getTaxes: async (req, res) => {
         try {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
-            const brands= await req.prisma.brand.findMany({
+            const taxes = await req.prisma.tax.findMany({
                 where: {
                     businessId: businessId
                 }
             })
 
-            // consoleLog('Business brands', brands)
+            // consoleLog('Business taxes', taxes)
 
-            return res.json({ ok: true, brands})
+            return res.json({ ok: true, taxes })
 
         } catch (error) {
-            consoleLog('get brands error', error)
+            consoleLog('get taxes error', error)
             res.json({ ok: false })
         }
     },
 
-    deleteBrand: async (req, res) => {
+
+    deleteTax: async (req, res) => {
         try {
 
-            const {id} = req.body 
+            const { id } = req.body
 
-            const brand = await req.prisma.brand.findFirst({
+            const tax = await req.prisma.tax.findFirst({
                 where: {
                     id: id,
                     businessId: req?.business?.id
@@ -70,17 +70,17 @@ const brandController = {
 
             // consoleLog('Delete Category', category)
 
-            const deleteBrand = await req.prisma.brand.delete({
+            const deleteTax = await req.prisma.tax.delete({
                 where: {
-                    id: brand.id
+                    id: tax.id
                 }
             })
 
-            res.json({ok:true})
-            
+            res.json({ ok: true })
+
         } catch (error) {
-            consoleLog('Brand Delete Error', error)
-            res.json({ok:false})
+            consoleLog('Tax Delete Error', error)
+            res.json({ ok: false })
         }
     }
 }

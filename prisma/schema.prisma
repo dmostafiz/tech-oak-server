@@ -72,6 +72,10 @@ model Business {
   customers Customer[]
   sales     Sale[]
   purchase  Purchase[]
+  products  Product[]
+  taxes     Tax[]
+
+  invoices Invoice[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -86,6 +90,8 @@ model Brand {
   businessId String   @db.ObjectId
 
   status Boolean @default(true)
+
+  products Product[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -108,6 +114,8 @@ model Category {
 
   status Boolean @default(true)
 
+  products Product[]
+
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
@@ -121,6 +129,8 @@ model Unit {
   businessId String   @db.ObjectId
 
   status Boolean @default(true)
+
+  products Product[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -164,6 +174,8 @@ model Supplier {
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
 
+  invoices Invoice[]
+
   description String?
 
   createdAt DateTime? @default(now())
@@ -194,6 +206,8 @@ model Customer {
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
 
+  invoices Invoice[]
+
   description String?
 
   createdAt DateTime? @default(now())
@@ -201,18 +215,31 @@ model Customer {
 }
 
 model Sale {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  customer    Customer @relation(fields: [customerId], references: [id])
-  customerId  String   @db.ObjectId
-  quantity    Int
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @db.ObjectId
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+
+  quantity Int
+
   totalAmount Int
-  paid        Int
-  due         Int
+
+  paid Int
+  due  Int
 
   status Boolean @default(true)
 
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String  @db.ObjectId
+
+  tax   Tax?    @relation(fields: [taxId], references: [id])
+  taxId String? @db.ObjectId
 
   description String?
 
@@ -221,20 +248,123 @@ model Sale {
 }
 
 model Purchase {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  supplier    Supplier @relation(fields: [supplierId], references: [id])
-  supplierId  String   @db.ObjectId
-  quantity    Int
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId String   @db.ObjectId
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+
+  quantity Int
+
   totalAmount Int
-  paid        Int
-  due         Int
+
+  paid Int
+
+  due Int
 
   status Boolean @default(true)
 
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
 
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String  @db.ObjectId
+
+  tax   Tax?    @relation(fields: [taxId], references: [id])
+  taxId String? @db.ObjectId
+
   description String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Product {
+  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  sku  String?
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? @db.ObjectId
+
+  brand   Brand?  @relation(fields: [brandId], references: [id])
+  brandId String? @db.ObjectId
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @db.ObjectId
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  tax   Tax?    @relation(fields: [taxId], references: [id])
+  taxId String? @db.ObjectId
+
+  alertQuantity Int? @default(0)
+
+  description String?
+
+  image String?
+
+  weight String?
+
+  status Boolean @default(true)
+
+  stock Int @default(0)
+
+  purchases Purchase[]
+  sales     Sale[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Invoice {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  totalAmount Int
+  paid        Int
+  due         Int
+
+  // sale / purchase
+  type String?
+
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId String?   @db.ObjectId
+
+  sales Sale[]
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?   @db.ObjectId
+
+  purchases Purchase[]
+
+  tax   Tax?    @relation(fields: [taxId], references: [id])
+  taxId String? @db.ObjectId
+
+  status Boolean @default(false)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Tax {
+  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  rate Int?
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  products Product[]
+
+  purchases Purchase[]
+  sales     Sale[]
+  invoices   Invoice[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
