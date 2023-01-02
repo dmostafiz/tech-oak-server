@@ -217,31 +217,26 @@ model Customer {
 model Sale {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @db.ObjectId
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId String  @db.ObjectId
-
-  quantity Int
-
-  totalAmount Int
-
-  paid Int
-  due  Int
-
-  status Boolean @default(true)
-
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
 
   invoice   Invoice @relation(fields: [invoiceId], references: [id])
   invoiceId String  @db.ObjectId
 
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @db.ObjectId
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+
+  quantity  Int
+  unitPrice Float
+  total     Float
+
   tax   Tax?    @relation(fields: [taxId], references: [id])
   taxId String? @db.ObjectId
 
-  description String?
+  taxRate Float @default(0)
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -250,32 +245,26 @@ model Sale {
 model Purchase {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  supplier   Supplier @relation(fields: [supplierId], references: [id])
-  supplierId String   @db.ObjectId
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId String  @db.ObjectId
-
-  quantity Int
-
-  totalAmount Int
-
-  paid Int
-
-  due Int
-
-  status Boolean @default(true)
-
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
 
   invoice   Invoice @relation(fields: [invoiceId], references: [id])
   invoiceId String  @db.ObjectId
 
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId String   @db.ObjectId
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+
+  quantity  Int
+  unitPrice Float
+  total     Float
+
   tax   Tax?    @relation(fields: [taxId], references: [id])
   taxId String? @db.ObjectId
 
-  description String?
+  taxRate Float @default(0)
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -289,6 +278,8 @@ model Product {
   unit   Unit?   @relation(fields: [unitId], references: [id])
   unitId String? @db.ObjectId
 
+  unitValue Float @default(0)
+
   brand   Brand?  @relation(fields: [brandId], references: [id])
   brandId String? @db.ObjectId
 
@@ -301,20 +292,33 @@ model Product {
   tax   Tax?    @relation(fields: [taxId], references: [id])
   taxId String? @db.ObjectId
 
+  taxRate Float @default(0)
+
   alertQuantity Int? @default(0)
 
   description String?
 
   image String?
 
-  weight String?
-
-  status Boolean @default(true)
-
   stock Int @default(0)
 
+  profitMargin Float
+
+  purchasePrice Float
+
+  sellingPriceIncTax Float
+
+  sellingPriceExcTax Float
+
   purchases Purchase[]
-  sales     Sale[]
+
+  sales Sale[]
+
+  rackNo String?
+  row    String?
+  column String?
+
+  status Boolean @default(true)
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -323,18 +327,20 @@ model Product {
 model Invoice {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  business   Business @relation(fields: [businessId], references: [id])
-  businessId String   @db.ObjectId
-
-  totalAmount Int
-  paid        Int
-  due         Int
+  refNo String?
 
   // sale / purchase
   type String?
 
   supplier   Supplier? @relation(fields: [supplierId], references: [id])
   supplierId String?   @db.ObjectId
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+
+  totalAmount Float
+  paid        Float
+  due         Float
 
   sales Sale[]
 
@@ -343,10 +349,11 @@ model Invoice {
 
   purchases Purchase[]
 
-  tax   Tax?    @relation(fields: [taxId], references: [id])
-  taxId String? @db.ObjectId
+  note String?
 
   status Boolean @default(false)
+
+  invoiceData DateTime?
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -355,7 +362,7 @@ model Invoice {
 model Tax {
   id   String  @id @default(auto()) @map("_id") @db.ObjectId
   name String?
-  rate Int?
+  rate Float   @default(0)
 
   business   Business @relation(fields: [businessId], references: [id])
   businessId String   @db.ObjectId
@@ -364,7 +371,6 @@ model Tax {
 
   purchases Purchase[]
   sales     Sale[]
-  invoices   Invoice[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt

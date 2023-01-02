@@ -4,6 +4,8 @@ const businessRoutes = require("./businessRoutes");
 const categoryRoutes = require("./categoryRoutes");
 const customerRoutes = require("./customerRoutes");
 const productRoutes = require("./productRoutes");
+const purchaseRoutes = require("./purchaseRoutes");
+const saleRoutes = require("./saleRoutes");
 const supplierRoutes = require("./supplierRoutes");
 const systemRouter = require("./systemRouter");
 const taxdRoutes = require("./taxRoutes");
@@ -25,6 +27,8 @@ const indexRouter = (app) => {
   app.use('/customer', customerRoutes)
   app.use('/tax', taxdRoutes)
   app.use('/product', productRoutes)
+  app.use('/purchase', purchaseRoutes)
+  app.use('/sale', saleRoutes)
 
 }
 

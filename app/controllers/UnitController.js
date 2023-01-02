@@ -4,7 +4,7 @@ const UnitController = {
 
     create: async (req, res) => {
         try {
-            consoleLog('brand body', req.body)
+            // consoleLog('brand body', req.body)
             // consoleLog('category user business', req.business)
             const { name, status, shortName } = req.body
 

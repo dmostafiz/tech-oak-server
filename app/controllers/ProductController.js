@@ -1,31 +1,67 @@
+const CloudinaryHelper = require("../Helpers/CloudinaryHelper")
 const consoleLog = require("../Helpers/consoleLog")
 
 const ProductController = {
 
     create: async (req, res) => {
         try {
-            consoleLog('brand body', req.body)
+            // consoleLog('brand body', req.body)
             // consoleLog('category user business', req.business)
 
-            const { name, status, description } = req.body
+            //    req.body
+
+            // return res.status(200).json({ ok: true })
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
 
+            const imageUploadResult = req.body.image ? await CloudinaryHelper.uploader.upload(req.body.image, {
+                folder: `product_images/${req?.user?.id}`,
+                format: 'webp',
+                width: 500,
+                height: 300,
+                crop: "fill",
+                quality: 75
+            }) : null
+
             const product = await req.prisma.product.create({
                 data: {
                     name: req.body.name,
-                    sku: req.body.sku,
+
+                    sku: req.body.sku || 'SKU-' + 1000 + +(await req.prisma.product.count()),
+
                     unitId: req.body.unitId,
+
+                    unitValue: req.body.unitValue,
+
                     brandId: req.body.brandId,
+
                     categoryId: req.body.categoryId,
+
                     businessId: req.business.id,
+
                     taxId: req.body.taxId,
-                    alertQuantity: req.body.alertQuantity,
+
+                    alertQuantity: +req.body.alertQuantity,
+
                     description: req.body.description,
-                    image: req.body.image,
-                    weight: req.body.weight,
-                    status: req.body.status == 'yes' ? true : false,
+
+                    image: imageUploadResult?.secure_url,
+
+                    taxRate: +req.body.taxRate,
+
+                    profitMargin: +req.body.profitMargin,
+
+                    purchasePrice: +req.body.purchasePrice,
+
+                    sellingPriceIncTax: +req.body.sellingPriceIncludingTax,
+
+                    sellingPriceExcTax: +req.body.sellingPriceExcludingTax,
+
+                    rackNo: req.body.rackNo,
+                    row: req.body.row,
+                    column: req.body.column
+                    // status: true,
                 }
 
             })
@@ -47,6 +83,12 @@ const ProductController = {
             const products = await req.prisma.product.findMany({
                 where: {
                     businessId: businessId
+                },
+                include: {
+                    category: true,
+                    brand: true,
+                    tax: true,
+                    unit: true
                 }
             })
 
@@ -59,6 +101,56 @@ const ProductController = {
             res.json({ ok: false })
         }
     },
+
+    searchProducts: async (req, res) => {
+        try {
+
+            const businessId = req?.business?.id
+            const userId = req?.user?.id
+
+            const query = req.params.query
+            const qStatus = req.params.status
+
+            var searchTearm = undefined
+
+            if(qStatus == 'sale'){
+                searchTearm = {
+                    stock: {
+                        gt: 0
+                    }
+                }
+            }
+
+            console.log('product search query: ', qStatus)
+
+            const products = await req.prisma.product.findMany({
+                where: {
+                    OR: [
+                        {name: {contains: query, mode: 'insensitive'}},
+                        {sku: {contains: query, mode: 'insensitive'}},
+                    ],
+
+                    ...searchTearm
+                },
+                take: 5,
+                include: {
+                    category: true,
+                    brand: true,
+                    tax: true,
+                    unit: true
+                }
+            })
+
+            // consoleLog('Business products', products)
+
+            return res.json({ ok: true, products })
+
+        } catch (error) {
+            consoleLog('get brands error', error)
+            res.json({ ok: false })
+        }
+    },
+    
 
     deleteProduct: async (req, res) => {
         try {
