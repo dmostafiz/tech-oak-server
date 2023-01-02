@@ -327,7 +327,7 @@ model Product {
 model Invoice {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  refNo String?
+  refNo Int?
 
   // sale / purchase
   type String?
