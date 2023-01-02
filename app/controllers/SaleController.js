@@ -5,7 +5,7 @@ const SaleController = {
 
     create: async (req, res) => {
         try {
-            consoleLog('purchase body', req.body)
+            // consoleLog('sale body', req.body)
      
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
@@ -14,7 +14,7 @@ const SaleController = {
                 data: {
                     type: 'sale',
                     customerId: req.body.customerId,
-                    refNo: req.body.sku || 'REF-' + 1000 + +(await req.prisma.invoice.count()),
+                    refNo: req.body.sku || 1000 + +(await req.prisma.invoice.count()),
                     businessId: req.business.id,
                     totalAmount: +req.body.totalAmount,
                     paid: +req.body.paidAmount,
@@ -24,8 +24,9 @@ const SaleController = {
                     status: true,
                 }
             })
+            
 
-            req?.body?.salePrducts?.forEach(async (product) => {
+            req?.body?.saleProducts?.forEach(async (product) => {
 
                 await req.prisma.sale.create({
                     data: {

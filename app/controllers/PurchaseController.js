@@ -14,7 +14,7 @@ const PurchaseController = {
                 data: {
                     type: 'purchase',
                     supplierId: req.body.supplierId,
-                    refNo: req.body.sku || 'REF-' + 1000 + +(await req.prisma.invoice.count()),
+                    refNo: req.body.sku || 1000 + +(await req.prisma.invoice.count()),
                     businessId: req.business.id,
                     totalAmount: +req.body.totalAmount,
                     paid: +req.body.paidAmount,
