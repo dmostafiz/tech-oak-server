@@ -327,7 +327,7 @@ model Product {
 model Invoice {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  refNo Int?
+  refNo String?
 
   // sale / purchase
   type String?
@@ -353,7 +353,7 @@ model Invoice {
 
   status Boolean @default(false)
 
-  invoiceData DateTime?
+  invoiceData DateTime? @default(now())
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt

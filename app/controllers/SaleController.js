@@ -14,7 +14,7 @@ const SaleController = {
                 data: {
                     type: 'sale',
                     customerId: req.body.customerId,
-                    refNo: req.body.sku || 1000 + +(await req.prisma.invoice.count()),
+                    refNo: req.body.sku || (1000 + +(await req.prisma.invoice.count())).toString(),
                     businessId: req.business.id,
                     totalAmount: +req.body.totalAmount,
                     paid: +req.body.paidAmount,
@@ -54,7 +54,7 @@ const SaleController = {
                 })
 
             }))
-            
+
             // await Promise.all([createSale])
 
             const getInvoice = await req.prisma.invoice.findFirst({
@@ -84,13 +84,69 @@ const SaleController = {
     getInvoices: async (req, res) => {
         try {
 
+            const date = req.query.date
+            const query = req.query.query
+            // consoleLog('Sales query', query)
+
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
             const invoices = await req.prisma.invoice.findMany({
                 where: {
                     businessId: businessId,
-                    type: 'sale'
+                    type: 'sale',
+                    createdAt: {
+                        gte: new Date(date[0]),
+                        lte: new Date(date[1]),
+                    },
+
+
+                    OR: [
+                        {
+                            refNo: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        },
+
+                        {
+                            customer: {
+                                firstName: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            customer: {
+                                lastName: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            customer: {
+                                email: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            customer: {
+                                mobile: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+                    ]
+
+
                 },
                 orderBy: {
                     createdAt: 'desc'

@@ -14,7 +14,7 @@ const PurchaseController = {
                 data: {
                     type: 'purchase',
                     supplierId: req.body.supplierId,
-                    refNo: req.body.sku || 1000 + +(await req.prisma.invoice.count()),
+                    refNo: req.body.sku || (1000 + (await req.prisma.invoice.count())).toString(),
                     businessId: req.business.id,
                     totalAmount: +req.body.totalAmount,
                     paid: +req.body.paidAmount,
@@ -81,13 +81,66 @@ const PurchaseController = {
     getInvoices: async (req, res) => {
         try {
 
+            const date = req.query.date
+            const query = req.query.query
+
+
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
             const invoices = await req.prisma.invoice.findMany({
                 where: {
                     businessId: businessId,
-                    type: 'purchase'
+                    type: 'purchase',
+                    createdAt: {
+                        gte: new Date(date[0]),
+                        lte: new Date(date[1]),
+                    },
+
+                    OR: [
+                        {
+                            refNo: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        },
+
+                        {
+                            supplier: {
+                                firstName: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            supplier: {
+                                lastName: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            supplier: {
+                                email: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            supplier: {
+                                mobile: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+                    ]
                 },
                 orderBy: {
                     createdAt: 'desc'
