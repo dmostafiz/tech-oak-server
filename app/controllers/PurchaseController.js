@@ -25,7 +25,7 @@ const PurchaseController = {
                 }
             })
 
-            req?.body?.purchasePrducts?.forEach(async (product) => {
+            await Promise.all(req?.body?.purchasePrducts?.map(async (product) => {
 
                 await req.prisma.purchase.create({
                     data: {
@@ -52,14 +52,19 @@ const PurchaseController = {
                     }
                 })
 
-            })
+            }))
 
             const getInvoice = await req.prisma.invoice.findFirst({
                 where: {
                     id: invoice.id
                 },
                 include: {
-                    purchases: true
+                    supplier: true,
+                    purchases: {
+                        include: {
+                            product: true
+                        }
+                    },
                 }
             })
 
@@ -83,6 +88,9 @@ const PurchaseController = {
                 where: {
                     businessId: businessId,
                     type: 'purchase'
+                },
+                orderBy: {
+                    createdAt: 'desc'
                 },
                 include: {
                     supplier: true,

@@ -33,8 +33,8 @@ const SupplierController = {
             })
 
 
-            res.json({ok: true, supplier})
-            
+            res.json({ ok: true, supplier })
+
         })
     },
 
@@ -48,6 +48,15 @@ const SupplierController = {
                 where: {
                     businessId: businessId,
                     status: true
+                },
+
+                include: {
+                    invoices: {
+                        include: {
+                            purchases: true,
+                            sales: true,
+                        }
+                    }
                 }
             })
 

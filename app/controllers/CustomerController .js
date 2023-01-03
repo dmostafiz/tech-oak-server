@@ -33,8 +33,8 @@ const CustomerController = {
             })
 
 
-            res.json({ok: true, customer})
-            
+            res.json({ ok: true, customer })
+
         })
     },
 
@@ -48,6 +48,15 @@ const CustomerController = {
                 where: {
                     businessId: businessId,
                     status: true
+                },
+
+                include: {
+                    invoices: {
+                        include: {
+                            purchases: true,
+                            sales: true,
+                        }
+                    }
                 }
             })
 
@@ -59,7 +68,7 @@ const CustomerController = {
 
         TryCatch(res, async () => {
 
-           
+
         })
     }
 

@@ -6,7 +6,7 @@ const SaleController = {
     create: async (req, res) => {
         try {
             // consoleLog('sale body', req.body)
-     
+
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
 
@@ -24,9 +24,9 @@ const SaleController = {
                     status: true,
                 }
             })
-            
 
-            req?.body?.saleProducts?.forEach(async (product) => {
+
+            await Promise.all(req?.body?.saleProducts?.map(async (product) => {
 
                 await req.prisma.sale.create({
                     data: {
@@ -53,20 +53,27 @@ const SaleController = {
                     }
                 })
 
-            })
+            }))
+            
+            // await Promise.all([createSale])
 
             const getInvoice = await req.prisma.invoice.findFirst({
                 where: {
                     id: invoice.id
                 },
                 include: {
-                    sales: true
+                    customer: true,
+                    sales: {
+                        include: {
+                            product: true
+                        }
+                    },
                 }
             })
 
             consoleLog('Created invoice', getInvoice)
 
-            return res.json({ ok: true, invoice:getInvoice })
+            return res.json({ ok: true, invoice: getInvoice })
 
         } catch (error) {
             consoleLog('salse create error', error)
@@ -84,6 +91,9 @@ const SaleController = {
                 where: {
                     businessId: businessId,
                     type: 'sale'
+                },
+                orderBy: {
+                    createdAt: 'desc'
                 },
                 include: {
                     customer: true,
