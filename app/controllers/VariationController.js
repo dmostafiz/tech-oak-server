@@ -34,6 +34,7 @@ const VariationController = {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
+            if(!businessId) return res.json({ ok: false })
 
             const variations= await req.prisma.variation.findMany({
                 where: {
@@ -57,10 +58,14 @@ const VariationController = {
 
             const {id} = req.body 
 
+            const businessId = req?.business?.id
+            if(!businessId) return res.json({ ok: false })
+
+
             const brand = await req.prisma.variation.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: businessId,
                 },
                 // include: {
 

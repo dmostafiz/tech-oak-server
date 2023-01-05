@@ -33,6 +33,7 @@ const brandController = {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
+            if (!businessId) return res.json({ ok: false })
 
             const taxes = await req.prisma.tax.findMany({
                 where: {
@@ -56,10 +57,14 @@ const brandController = {
 
             const { id } = req.body
 
+            const businessId = req?.business?.id
+            if (!businessId) return res.json({ ok: false })
+
+
             const tax = await req.prisma.tax.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: businessId
                 },
                 // include: {
 

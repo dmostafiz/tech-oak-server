@@ -8,6 +8,8 @@ const SupplierController = {
         TryCatch(res, async () => {
 
             const businessId = req.business.id
+            if(!businessId) return res.json({ ok: false })
+
 
             const supplier = await req.prisma.supplier.create({
                 data: {
@@ -43,7 +45,9 @@ const SupplierController = {
         TryCatch(res, async () => {
 
             const businessId = req.business.id
+            if(!businessId) return res.json({ ok: false })
 
+            
             const suppliers = await req.prisma.supplier.findMany({
                 where: {
                     businessId: businessId,

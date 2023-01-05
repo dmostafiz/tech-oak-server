@@ -33,6 +33,7 @@ const UnitController = {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
+            if(!businessId) return res.json({ ok: false })
 
             const units = await req.prisma.unit.findMany({
                 where: {
@@ -56,10 +57,13 @@ const UnitController = {
 
             const { id } = req.body
 
+            const businessId = req?.business?.id
+            if(!businessId) return res.json({ ok: false })
+
             const unit = await req.prisma.unit.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: businessId
                 },
                 // include: {
 

@@ -3,7 +3,10 @@ const brandRoutes = require("./brandRoutes");
 const businessRoutes = require("./businessRoutes");
 const categoryRoutes = require("./categoryRoutes");
 const customerRoutes = require("./customerRoutes");
+const expenseRoutes = require("./expenseRoutes");
+const posRoutes = require("./posRoutes");
 const productRoutes = require("./productRoutes");
+const profileRoutes = require("./profileRoutes");
 const purchaseRoutes = require("./purchaseRoutes");
 const saleRoutes = require("./saleRoutes");
 const supplierRoutes = require("./supplierRoutes");
@@ -29,7 +32,9 @@ const indexRouter = (app) => {
   app.use('/product', productRoutes)
   app.use('/purchase', purchaseRoutes)
   app.use('/sale', saleRoutes)
-
+  app.use('/expense', expenseRoutes)
+  app.use('/pos', posRoutes)
+  app.use('/profile', profileRoutes)
 }
 
 module.exports = indexRouter;

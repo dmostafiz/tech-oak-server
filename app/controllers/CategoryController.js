@@ -36,6 +36,7 @@ const categoryController = {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
+            if(!businessId) return res.json({ ok: false })
 
             const categories = await req.prisma.category.findMany({
                 where: {
@@ -60,6 +61,7 @@ const categoryController = {
         try {
 
             const businessId = req?.business?.id 
+            if(!businessId) return res.json({ ok: false })
 
             const categories = await req.prisma.category.findMany({
                 where: {
@@ -80,11 +82,14 @@ const categoryController = {
         try {
 
             const {id} = req.body 
+            const businessId = req?.business?.id
+            if(!businessId) return res.json({ ok: false })
+
 
             const category = await req.prisma.category.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: businessId
                 },
                 // include: {
 

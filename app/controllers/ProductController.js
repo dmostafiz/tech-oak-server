@@ -80,6 +80,8 @@ const ProductController = {
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
+            if(!businessId) return res.json({ ok: false })
+
             const products = await req.prisma.product.findMany({
                 where: {
                     businessId: businessId
@@ -102,11 +104,43 @@ const ProductController = {
         }
     },
 
+    getProductById: async (req, res) => {
+        try {
+
+            const businessId = req?.business?.id
+            const userId = req?.user?.id
+
+            if(!businessId) return res.json({ ok: false })
+
+            const product = await req.prisma.product.findFirst({
+                where: {
+                    sku: req.params.id
+                },
+                include: {
+                    category: true,
+                    brand: true,
+                    tax: true,
+                    unit: true
+                }
+            })
+
+            // consoleLog('Business products', products)
+
+            return res.json({ ok: true, product })
+
+        } catch (error) {
+            consoleLog('get brands error', error)
+            res.json({ ok: false })
+        }
+    },
+
     searchProducts: async (req, res) => {
         try {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
+
+            if(!businessId) return res.json({ ok: false })
 
             const query = req.params.query
             const qStatus = req.params.status
@@ -125,6 +159,7 @@ const ProductController = {
 
             const products = await req.prisma.product.findMany({
                 where: {
+                    businessId: businessId,
                     OR: [
                         {name: {contains: query, mode: 'insensitive'}},
                         {sku: {contains: query, mode: 'insensitive'}},
@@ -157,10 +192,14 @@ const ProductController = {
 
             const { id } = req.body
 
+            const businessId =  req?.business?.id
+            if(!businessId) return res.json({ ok: false })
+
+
             const product = await req.prisma.product.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: businessId
                 },
                 // include: {
 

@@ -1,60 +1,63 @@
 const consoleLog = require("../Helpers/consoleLog")
 
-const brandController = {
+const ExpenseController = {
 
     create: async (req, res) => {
         try {
-            consoleLog('brand body', req.body)
+            // consoleLog('expense body', req.body)
             // consoleLog('category user business', req.business)
 
-            const { name, status, description } = req.body
+            const { type, amount, note, expenseDate } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
 
-            const brand = await req.prisma.brand.create({
+            const expense = await req.prisma.expense.create({
                 data: {
-                    name: name,
-                    description: description,
-                    status: status == 'yes' ? true : false,
+                    type: type,
+                    note: note,
+                    amount: amount,
                     businessId: req?.business?.id,
+                    expenseDate: expenseDate
                 }
             })
 
-            return res.json({ ok: true, brand })
+            return res.json({ ok: true, expense })
 
         } catch (error) {
-            consoleLog('brand create error', error)
+            consoleLog('expense create error', error)
             res.json({ ok: false })
         }
     },
 
-    getBrands: async (req, res) => {
+    getExpenses: async (req, res) => {
         try {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
-
             if(!businessId) return res.json({ ok: false })
 
 
-            const brands= await req.prisma.brand.findMany({
+            const expenses= await req.prisma.expense.findMany({
                 where: {
                     businessId: businessId
+                },
+                orderBy: {
+                    createdAt: "desc"
                 }
             })
 
-            // consoleLog('Business brands', brands)
+            // consoleLog('Business expenses', expenses)
 
-            return res.json({ ok: true, brands})
+            return res.json({ ok: true, expenses})
 
         } catch (error) {
-            consoleLog('get brands error', error)
+            consoleLog('get expenses error', error)
             res.json({ ok: false })
         }
     },
 
-    deleteBrand: async (req, res) => {
+    deleteExpense: async (req, res) => {
         try {
 
             const {id} = req.body 
@@ -63,7 +66,7 @@ const brandController = {
             if(!businessId) return res.json({ ok: false })
 
 
-            const brand = await req.prisma.brand.findFirst({
+            const expense = await req.prisma.expense.findFirst({
                 where: {
                     id: id,
                     businessId: businessId
@@ -73,11 +76,9 @@ const brandController = {
                 // }
             })
 
-
-
             // consoleLog('Delete Category', category)
 
-            const deleteBrand = await req.prisma.brand.delete({
+            const deleteExpense = await req.prisma.expense.delete({
                 where: {
                     id: brand.id
                 }
@@ -86,10 +87,10 @@ const brandController = {
             res.json({ok:true})
             
         } catch (error) {
-            consoleLog('Brand Delete Error', error)
+            consoleLog('Expense Delete Error', error)
             res.json({ok:false})
         }
     }
 }
 
-module.exports = brandController
+module.exports = ExpenseController

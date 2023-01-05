@@ -88,6 +88,9 @@ const PurchaseController = {
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
+            if(!businessId) return res.json({ ok: false })
+
+
             const invoices = await req.prisma.invoice.findMany({
                 where: {
                     businessId: businessId,
@@ -170,6 +173,8 @@ const PurchaseController = {
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
+            if(!businessId) return res.json({ ok: false })
+
 
             const query = req.params.query
 
@@ -177,6 +182,7 @@ const PurchaseController = {
 
             const products = await req.prisma.product.findMany({
                 where: {
+                    businessId: businessId,
                     OR: [
                         { name: { contains: query, mode: 'insensitive' } },
                         { sku: { contains: query, mode: 'insensitive' } },
@@ -207,10 +213,14 @@ const PurchaseController = {
 
             const { id } = req.body
 
+            const businessId = req?.business?.id
+            if(!businessId) return res.json({ ok: false })
+
+
             const product = await req.prisma.product.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: businessId
                 },
                 // include: {
 
