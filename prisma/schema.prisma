@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount", "fullTextSearch"]
 }
 
 datasource db {
@@ -332,6 +333,12 @@ model Invoice {
 
   // sale / purchase
   type String?
+
+  // sale / pos
+  saleType String? @default("sale")
+
+  // cash / card / credit / cheque
+  paymentMethod String @default("cash")
 
   supplier   Supplier? @relation(fields: [supplierId], references: [id])
   supplierId String?   @db.ObjectId

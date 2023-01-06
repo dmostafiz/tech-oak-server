@@ -13,6 +13,7 @@ const SaleController = {
             const invoice = await req.prisma.invoice.create({
                 data: {
                     type: 'sale',
+                    saleType: 'sale',
                     customerId: req.body.customerId,
                     refNo: req.body.sku || (1000 + +(await req.prisma.invoice.count())).toString(),
                     businessId: req.business.id,
@@ -68,6 +69,7 @@ const SaleController = {
                             product: true
                         }
                     },
+                    business: true
                 }
             })
 
@@ -161,6 +163,7 @@ const SaleController = {
                             product: true
                         }
                     },
+                    business: true
                 }
             })
 

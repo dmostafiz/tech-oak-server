@@ -4,28 +4,176 @@ const PosController = {
 
     create: async (req, res) => {
         try {
-            // consoleLog('expense body', req.body)
-            // consoleLog('category user business', req.business)
-
-            const { type, amount, note, expenseDate } = req.body
+            // consoleLog('sale body', req.body)
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
 
-            const expense = await req.prisma.expense.create({
+            const invoice = await req.prisma.invoice.create({
                 data: {
-                    type: type,
-                    note: note,
-                    amount: amount,
-                    businessId: req?.business?.id,
-                    expenseDate: expenseDate
+                    type: 'sale',
+                    saleType: 'pos',
+                    paymentMethod: req.body.paymentMethod,
+                    customerId: req.body.customerId,
+                    refNo: req.body.sku || (1000 + +(await req.prisma.invoice.count())).toString(),
+                    businessId: req.business.id,
+                    totalAmount: +req.body.totalAmount,
+                    paid: req.body.paymentMethod == 'credit' ? 0 : +req.body.paidAmount,
+                    due: req.body.paymentMethod == 'credit' ? +req.body.paidAmount : +req.body.dueAmount,
+                    note: req.body.note,
+                    invoiceData: req.body.saleDate,
+                    status: true,
                 }
             })
 
-            return res.json({ ok: true, expense })
+
+            await Promise.all(req?.body?.saleProducts?.map(async (product) => {
+
+                await req.prisma.sale.create({
+                    data: {
+                        customerId: req.body.customerId,
+                        businessId: req.business.id,
+                        invoiceId: invoice.id,
+                        productId: product.id,
+                        quantity: +product.qty,
+                        unitPrice: product.purchasePrice,
+                        total: product.purchasePrice * product.qty,
+                        taxId: product.taxId,
+                        taxRate: +product.taxRate
+                    }
+                })
+
+                await req.prisma.product.update({
+                    where: {
+                        id: product.id
+                    },
+                    data: {
+                        stock: {
+                            decrement: +product.qty
+                        }
+                    }
+                })
+
+            }))
+
+            // await Promise.all([createSale])
+
+            const getInvoice = await req.prisma.invoice.findFirst({
+                where: {
+                    id: invoice.id
+                },
+                include: {
+                    customer: true,
+                    sales: {
+                        include: {
+                            product: true
+                        }
+                    },
+                    business: true
+                }
+            })
+
+            consoleLog('Created invoice', getInvoice)
+
+            return res.json({ ok: true, invoice: getInvoice })
 
         } catch (error) {
-            consoleLog('expense create error', error)
+            consoleLog('salse create error', error)
+            res.json({ ok: false })
+        }
+    },
+
+    getInvoices: async (req, res) => {
+        try {
+
+            const date = req.query.date
+            const query = req.query.query
+            // consoleLog('Sales query', query)
+
+            const businessId = req?.business?.id
+            const userId = req?.user?.id
+
+            if(!businessId) return res.json({ ok: false })
+
+
+            const invoices = await req.prisma.invoice.findMany({
+                where: {
+                    businessId: businessId,
+                    type: 'sale',
+                    saleType: 'pos',
+                    createdAt: {
+                        gte: new Date(date[0]),
+                        lte: new Date(date[1]),
+                    },
+
+
+                    OR: [
+                        {
+                            refNo: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        },
+
+                        {
+                            customer: {
+                                firstName: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            customer: {
+                                lastName: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            customer: {
+                                email: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+
+                        {
+                            customer: {
+                                mobile: {
+                                    contains: query,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        },
+                    ]
+
+
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                include: {
+                    customer: true,
+                    sales: {
+                        include: {
+                            product: true
+                        }
+                    },
+                    business: true
+                }
+            })
+
+            // consoleLog('Business invoices', invoices)
+
+            return res.json({ ok: true, invoices })
+
+        } catch (error) {
+            consoleLog('get sales error', error)
             res.json({ ok: false })
         }
     },
@@ -37,11 +185,14 @@ const PosController = {
             const userId = req?.user?.id
 
 
-            if(!businessId) return res.json({ ok: false, msg: "Business not found!" })
+            if (!businessId) return res.json({ ok: false, msg: "Business not found!" })
 
-            const products= await req.prisma.product.findMany({
+            const products = await req.prisma.product.findMany({
                 where: {
-                    businessId: businessId
+                    businessId: businessId,
+                    stock: {
+                        gt: 0
+                    }
                 },
                 orderBy: {
                     createdAt: "desc"
@@ -50,7 +201,7 @@ const PosController = {
 
             // consoleLog('Business products', products)
 
-            return res.json({ ok: true, products})
+            return res.json({ ok: true, products })
 
         } catch (error) {
             consoleLog('get pos products error', error)
@@ -61,7 +212,7 @@ const PosController = {
     deletePos: async (req, res) => {
         try {
 
-            const {id} = req.body 
+            const { id } = req.body
 
             const expense = await req.prisma.expense.findFirst({
                 where: {
@@ -81,11 +232,11 @@ const PosController = {
                 }
             })
 
-            res.json({ok:true})
-            
+            res.json({ ok: true })
+
         } catch (error) {
             consoleLog('Expense Delete Error', error)
-            res.json({ok:false})
+            res.json({ ok: false })
         }
     }
 }
