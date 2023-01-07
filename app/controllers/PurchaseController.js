@@ -152,7 +152,11 @@ const PurchaseController = {
                     supplier: true,
                     purchases: {
                         include: {
-                            product: true
+                            product: {
+                                include: {
+                                    brand: true
+                                }
+                            }
                         }
                     },
                     business: true
