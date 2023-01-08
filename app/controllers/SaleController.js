@@ -88,12 +88,32 @@ const SaleController = {
 
             const date = req.query.date
             const query = req.query.query
+            const status = req.query.status
             // consoleLog('Sales query', query)
+
+            var statusQuery
+
+            if (status == 'paid') {
+                statusQuery = {
+                    due: {
+                        equals: 0
+                    }
+                }
+            }
+            else if (status == 'due') {
+                statusQuery = {
+                    paid: {
+                        equals: 0
+                    }
+                }
+            } else {
+                statusQuery = undefined
+            }
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ ok: false })
 
 
             const invoices = await req.prisma.invoice.findMany({
@@ -104,7 +124,6 @@ const SaleController = {
                         gte: new Date(date[0]),
                         lte: new Date(date[1]),
                     },
-
 
                     OR: [
                         {
@@ -149,9 +168,9 @@ const SaleController = {
                                 }
                             }
                         },
-                    ]
+                    ],
 
-
+                    ...statusQuery
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -183,7 +202,7 @@ const SaleController = {
             const businessId = req?.business?.id
             const userId = req?.user?.id
 
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ ok: false })
 
             const query = req.params.query
 
@@ -223,7 +242,7 @@ const SaleController = {
             const { id } = req.body
 
             const businessId = req?.business?.id
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ ok: false })
 
 
             const product = await req.prisma.product.findFirst({

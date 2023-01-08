@@ -84,6 +84,28 @@ const PurchaseController = {
             const date = req.query.date
             const query = req.query.query
 
+            const status = req.query.status
+            // consoleLog('Sales query', query)
+
+            var statusQuery
+
+            if (status == 'paid') {
+                statusQuery = {
+                    due: {
+                        equals: 0
+                    }
+                }
+            }
+            else if (status == 'due') {
+                statusQuery = {
+                    paid: {
+                        equals: 0
+                    }
+                }
+            } else {
+                statusQuery = undefined
+            }
+
 
             const businessId = req?.business?.id
             const userId = req?.user?.id
@@ -143,7 +165,9 @@ const PurchaseController = {
                                 }
                             }
                         },
-                    ]
+                    ],
+
+                    ...statusQuery
                 },
                 orderBy: {
                     createdAt: 'desc'
