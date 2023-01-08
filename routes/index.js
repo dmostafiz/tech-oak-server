@@ -10,17 +10,17 @@ const profileRoutes = require("./profileRoutes");
 const purchaseRoutes = require("./purchaseRoutes");
 const saleRoutes = require("./saleRoutes");
 const supplierRoutes = require("./supplierRoutes");
-const systemRouter = require("./systemRouter");
+const reportRouter = require("./reportRouter");
 const taxdRoutes = require("./taxRoutes");
 const unitRoutes = require("./unitRoutes");
 const variationRoutes = require("./variationRoutes");
 
 // /* GET home page. */
-// require('./systemRouter')(router)
+// require('./reportRouter')(router)
 
 const indexRouter = (app) => {
   app.use('/auth', authRoutes);
-  app.use('/', systemRouter)
+  app.use('/report', reportRouter)
   app.use('/business', businessRoutes)
   app.use('/category', categoryRoutes)
   app.use('/brand', brandRoutes)
