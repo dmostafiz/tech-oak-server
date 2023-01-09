@@ -1,3 +1,4 @@
+const moment = require("moment")
 const consoleLog = require("../Helpers/consoleLog")
 
 
@@ -120,6 +121,86 @@ const ReportController = {
 
          consoleLog('Heading report error', error)
          res.json({ ok: false })
+      }
+   },
+
+   getThirtyDaySaleReport: async (req, res) => {
+      try {
+
+         const businessId = req?.business?.id
+         const userId = req?.user?.id
+         const query = req.query.query
+
+         if (!businessId) return res.json({ ok: false })
+
+         const date = new Date()
+
+         const sales = await req.prisma.invoice.groupBy({
+            by: ['createdAt', 'totalAmount'],
+            where: {
+               businessId: businessId,
+               type: 'sale',
+               createdAt: {
+                  gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * date.getDate())).toISOString()
+               },
+
+            },
+
+            orderBy: {
+               createdAt: 'asc'
+            },
+
+            // _sum: {
+            //    sales: true,
+            //  },
+
+            // include: {
+            //    customer: true,
+            //    sales: {
+            //       include: {
+            //          product: true
+            //       }
+            //    },
+            //    business: true
+            // }
+
+         })
+
+         const salesWithConvertedMonthName = sales.map((sale) => {
+            return {
+               ...sale,
+               date: moment(sale.createdAt).format('ll')
+            }
+         })
+
+
+ 
+        var result = salesWithConvertedMonthName.reduce(function(h, obj) {
+          h[obj.date] = (h[obj.date] || []).concat(obj);
+          return h; 
+        }, {});
+
+        result = Object.keys(result).map(key => {
+          return {
+              date: key, 
+              total: result[key].reduce((a, b) => a + b.totalAmount, 0)
+            }
+        });
+      //   console.log(result);
+
+         console.log('getThirtyDaySaleReport', result)
+
+         const keys = result.map((r) => r.date)
+         const values = result.map((r) => r.total.toFixed(2))
+
+         // consoleLog('getThirtyDaySaleReport', groupedBydate)
+
+         return res.json({ ok: true, keys, values })
+
+
+      } catch (error) {
+         consoleLog('getThirtyDaySaleReport error', error)
+         return res.json({ ok: false })
       }
    }
 

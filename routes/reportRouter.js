@@ -1,13 +1,10 @@
 var express = require('express');
-const { getHeadingReports } = require('../app/controllers/ReportController');
+const { getHeadingReports, getThirtyDaySaleReport } = require('../app/controllers/ReportController');
 const authMiddleware = require('../app/middlewares/authMiddleware');
 var router = express.Router();
 
 router.get('/heading', [authMiddleware], getHeadingReports);
-
-router.get('/ok', function (req, res) {
-    res.render('index', { title: 'Fullstack App' });
-});
+router.get('/sales_thirty_days', [authMiddleware], getThirtyDaySaleReport);
 
 
 
