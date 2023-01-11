@@ -112,14 +112,14 @@ const ReportController = {
 
          }
 
-         consoleLog('Purchase data', purcasesData)
+         // consoleLog('Purchase data', purcasesData)
 
 
          return res.json({ ok: true, sale: salesData, purchase: purcasesData })
 
       } catch (error) {
 
-         consoleLog('Heading report error', error)
+         // consoleLog('Heading report error', error)
          res.json({ ok: false })
       }
    },
@@ -174,21 +174,21 @@ const ReportController = {
          })
 
 
- 
-        var result = salesWithConvertedMonthName.reduce(function(h, obj) {
-          h[obj.date] = (h[obj.date] || []).concat(obj);
-          return h; 
-        }, {});
 
-        result = Object.keys(result).map(key => {
-          return {
-              date: key, 
-              total: result[key].reduce((a, b) => a + b.totalAmount, 0)
+         var result = salesWithConvertedMonthName.reduce(function (h, obj) {
+            h[obj.date] = (h[obj.date] || []).concat(obj);
+            return h;
+         }, {});
+
+         result = Object.keys(result).map(key => {
+            return {
+               date: key,
+               total: result[key].reduce((a, b) => a + b.totalAmount, 0)
             }
-        });
-      //   console.log(result);
+         });
+         //   console.log(result);
 
-         console.log('getThirtyDaySaleReport', result)
+         // console.log('getThirtyDaySaleReport', result)
 
          const keys = result.map((r) => r.date)
          const values = result.map((r) => r.total.toFixed(2))
@@ -199,7 +199,203 @@ const ReportController = {
 
 
       } catch (error) {
-         consoleLog('getThirtyDaySaleReport error', error)
+         // consoleLog('getThirtyDaySaleReport error', error)
+         return res.json({ ok: false })
+      }
+   },
+
+
+   getSalesCurrentYear: async (req, res) => {
+      try {
+
+         const businessId = req?.business?.id
+         const userId = req?.user?.id
+         const query = req.query.query
+
+         if (!businessId) return res.json({ ok: false })
+
+         const date = new Date()
+
+         const sales = await req.prisma.invoice.groupBy({
+            by: ['createdAt', 'totalAmount'],
+            where: {
+               businessId: businessId,
+               type: 'sale',
+               createdAt: {
+                  gte: new Date(Date.now() - 31556952000).toISOString()
+               },
+
+            },
+
+            orderBy: {
+               createdAt: 'asc'
+            },
+
+            // _sum: {
+            //    sales: true,
+            //  },
+
+            // include: {
+            //    customer: true,
+            //    sales: {
+            //       include: {
+            //          product: true
+            //       }
+            //    },
+            //    business: true
+            // }
+
+         })
+
+         const salesWithConvertedMonthName = sales.map((sale) => {
+            return {
+               ...sale,
+               date: moment(sale.createdAt).format('MMMM')
+            }
+         })
+
+
+
+         var result = salesWithConvertedMonthName.reduce(function (h, obj) {
+            h[obj.date] = (h[obj.date] || []).concat(obj);
+            return h;
+         }, {});
+
+         result = Object.keys(result).map(key => {
+            return {
+               date: key,
+               total: result[key].reduce((a, b) => a + b.totalAmount, 0)
+            }
+         });
+         console.log(result);
+
+         // console.log('getThirtyDaySaleReport', result)
+
+         const keys = result.map((r) => r.date)
+         const values = result.map((r) => r.total.toFixed(2))
+
+         // consoleLog('getThirtyDaySaleReport', groupedBydate)
+
+         return res.json({ ok: true, keys, values })
+
+
+      } catch (error) {
+         // consoleLog('getThirtyDaySaleReport error', error)
+         return res.json({ ok: false })
+      }
+   },
+
+   getSalesDue: async (req, res) => {
+      try {
+
+         const businessId = req?.business?.id
+         const userId = req?.user?.id
+         const query = req.query.query
+
+         if (!businessId) return res.json({ ok: false })
+
+         const sales = await req.prisma.invoice.findMany({
+            where: {
+               businessId: businessId,
+               type: 'sale',
+               due: {
+                  gt: 0
+               }
+            },
+
+            include: {
+               business: true,
+               customer: true,
+               sales: {
+                  include: {
+                     product: true
+                  }
+               }
+            }
+         })
+
+         // consoleLog('Sales Due', sales)
+
+         return res.json({ ok: true, sales: sales })
+
+      } catch (error) {
+         // consoleLog('getThirtyDaySaleReport error', error)
+         return res.json({ ok: false })
+      }
+   },
+
+   getPurchasesDue: async (req, res) => {
+      try {
+
+         const businessId = req?.business?.id
+         const userId = req?.user?.id
+         const query = req.query.query
+
+         if (!businessId) return res.json({ ok: false })
+
+         const purchases = await req.prisma.invoice.findMany({
+            where: {
+               businessId: businessId,
+               type: 'purchase',
+               due: {
+                  gt: 0
+               }
+            },
+
+            include: {
+               business: true,
+               supplier: true,
+               purchases: {
+                  include: {
+                     product: true
+                  }
+               }
+            }
+         })
+
+         // consoleLog('Purchases Due', purchases)
+
+         return res.json({ ok: true, purchases: purchases })
+
+      } catch (error) {
+         // consoleLog('getThirtyDaySaleReport error', error)
+         return res.json({ ok: false })
+      }
+   },
+
+   getStockAlerts: async (req, res) => {
+      try {
+
+         const businessId = req?.business?.id
+         const userId = req?.user?.id
+         const query = req.query.query
+
+         if (!businessId) return res.json({ ok: false })
+
+         const products = await req.prisma.product.findMany({
+            where: {
+               businessId: businessId,
+               stock: {
+                  lt: 50
+               }
+            },
+            include: {
+               brand: true,
+               category: true,
+            }
+         })
+
+         const stockedProducts = products.map(product => {
+            if(product.stock <= product.alertQuantity){
+               return product
+            }
+         })
+
+         consoleLog('getStockAlert', stockedProducts)
+         return res.json({ok: true, products: stockedProducts})
+
+      } catch (error) {
+         // consoleLog('getThirtyDaySaleReport error', error)
          return res.json({ ok: false })
       }
    }
