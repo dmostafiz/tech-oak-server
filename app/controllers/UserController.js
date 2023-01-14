@@ -1,6 +1,7 @@
 const consoleLog = require("../Helpers/consoleLog")
 var randomId = require('random-id');
 const bcrypt = require('bcryptjs');
+const mailer = require("../Helpers/mailer");
 
 const userController = {
 
@@ -43,6 +44,21 @@ const userController = {
                 }
             })
 
+
+            let info = await mailer.sendMail({
+                from: '"Fred Foo 👻" <foo@example.com>', // sender address
+                to: "bar@example.com, baz@example.com", // list of receivers
+                subject: "Hello ✔", // Subject line
+                template: 'staffCreated',
+                context: {
+                    name: firstName + ' ' + lastName,
+                    email: email,
+                    password: password
+                }
+            });
+
+
+            consoleLog("Message sent: %s", info.messageId);
             consoleLog('created staff', createUser)
 
             return res.send({ ok: true })
@@ -63,12 +79,12 @@ const userController = {
 
             const businessId = req?.store?.id
             const userId = req?.user?.id
-            if (!businessId) return res.json({ ok: false, msg: 'Business not found' })            
+            if (!businessId) return res.json({ ok: false, msg: 'Business not found' })
 
             const users = await req.prisma.user.findMany({
                 where: {
                     id: {
-                      not: userId
+                        not: userId
                     },
                     storeId: businessId,
                 }
