@@ -10,14 +10,14 @@ const ExpenseController = {
             const { type, amount, note, expenseDate } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const expense = await req.prisma.expense.create({
                 data: {
                     type: type,
                     note: note,
                     amount: amount,
-                    businessId: req?.business?.id,
+                    businessId: req?.store?.id,
                     expenseDate: expenseDate
                 }
             })
@@ -33,7 +33,7 @@ const ExpenseController = {
     getExpenses: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
             if(!businessId) return res.json({ ok: false })
 
@@ -62,7 +62,7 @@ const ExpenseController = {
 
             const {id} = req.body 
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
 

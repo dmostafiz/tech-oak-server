@@ -10,13 +10,13 @@ const brandController = {
             const { name, rate } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const tax = await req.prisma.tax.create({
                 data: {
                     name: name,
                     rate: rate,
-                    businessId: req?.business?.id,
+                    businessId: req?.store?.id,
                 }
             })
 
@@ -31,7 +31,7 @@ const brandController = {
     getTaxes: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
             if (!businessId) return res.json({ ok: false })
 
@@ -57,7 +57,7 @@ const brandController = {
 
             const { id } = req.body
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if (!businessId) return res.json({ ok: false })
 
 

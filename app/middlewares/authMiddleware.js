@@ -19,14 +19,17 @@ const authMiddleware = (req, res, next) => {
 
             const business = await req.prisma.business.findFirst({
                 where: {
-                    adminId: decoded.id,
-                    isDefault: true
+                    operators: {
+                        some: {
+                            id: decoded.id
+                        }
+                    },
                 }
             })
             
             req.user = decoded
             req.role = decoded.role
-            req.business = business
+            req.store = business
             next()
         }
     )

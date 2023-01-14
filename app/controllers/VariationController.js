@@ -10,14 +10,14 @@ const VariationController = {
             const { name, status, values } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const brand = await req.prisma.variation.create({
                 data: {
                     name: name,
                     values: values,
                     status: status == 'yes' ? true : false,
-                    businessId: req?.business?.id,
+                    businessId: req?.store?.id,
                 }
             })
 
@@ -32,7 +32,7 @@ const VariationController = {
     getVariations: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
             if(!businessId) return res.json({ ok: false })
 
@@ -58,7 +58,7 @@ const VariationController = {
 
             const {id} = req.body 
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
 

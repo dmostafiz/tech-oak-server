@@ -8,14 +8,14 @@ const PurchaseController = {
             consoleLog('purchase body', req.body)
      
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const invoice = await req.prisma.invoice.create({
                 data: {
                     type: 'purchase',
                     supplierId: req.body.supplierId,
                     refNo: req.body.sku || (1000 + (await req.prisma.invoice.count())).toString(),
-                    businessId: req.business.id,
+                    businessId: req?.store?.id,
                     totalAmount: +req.body.totalAmount,
                     paid: +req.body.paidAmount,
                     due: +req.body.dueAmount,
@@ -30,7 +30,7 @@ const PurchaseController = {
                 await req.prisma.purchase.create({
                     data: {
                         supplierId: req.body.supplierId,
-                        businessId: req.business.id,
+                        businessId: req?.store?.id,
                         invoiceId: invoice.id,
                         productId: product.id,
                         quantity: +product.qty,
@@ -107,7 +107,7 @@ const PurchaseController = {
             }
 
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if(!businessId) return res.json({ ok: false })
@@ -200,7 +200,7 @@ const PurchaseController = {
     searchProducts: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
             if(!businessId) return res.json({ ok: false })
 
@@ -242,7 +242,7 @@ const PurchaseController = {
 
             const { id } = req.body
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
 

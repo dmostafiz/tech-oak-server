@@ -22,6 +22,8 @@ module.exports = {
                     avatar: true,
                     password: true,
                     businesses: true,
+                    store: true,
+                    business_role: true,
                     store: true
                 }
             })
@@ -42,7 +44,9 @@ module.exports = {
                 lastName: user.lastName,
                 email: user.email,
                 avatar: user.avatar,
-                businesses: user.businesses
+                businesses: user.businesses,
+                business_role: user.business_role,
+                store: user.store,
             }
 
             // console.log('User with businesses', tokenUser)
@@ -120,7 +124,7 @@ module.exports = {
 
     emailSignup: async (req, res) => {
 
-        const { email, firstName, lastName, phoneNo, password } = req.body
+        const { email, firstName, lastName, password } = req.body
         const hashedPassword = bcrypt.hashSync(password, 12);
 
         try {
@@ -133,25 +137,24 @@ module.exports = {
 
             if (user) return res.send({ ok: false, msg: 'Sorry! the email is already used.' })
 
-
             const createUser = await req.prisma.user.create({
                 data: {
                     email: email,
                     firstName: firstName,
                     lastName: lastName,
-                    // phoneNo: phoneNo,
+                    business_role: 'admin',
                     password: hashedPassword,
                     isNew: true,
                 }
             })
-
 
             const tokenUser = {
                 id: createUser.id,
                 firstName: createUser.firstName,
                 lastName: createUser.firstName,
                 email: createUser.email,
-                avatar: createUser.avatar
+                avatar: createUser.avatar,
+                business_role: createUser.business_role,
             }
 
             const accessToken = jwtSignAccessToken(tokenUser, '1d')
@@ -300,7 +303,9 @@ module.exports = {
                         avatar: true,
                         createdAt: true,
                         updatedAt: true,
-                        businesses: true
+                        businesses: true,
+                        business_role: true,
+                        store: true
                     }
                 })
 
@@ -311,13 +316,13 @@ module.exports = {
                 return res.json({ ok: true, user: userData })
             }
 
-            return res.json({ ok: false, msg: "আপনি অথরাইজড ব্লগার না।" })
+            return res.json({ ok: false, msg: "You are not authorised." })
 
         } catch (error) {
 
             consoleLog('get authorized user error', error.message)
 
-            return res.json({ ok: false, msg: "আপনি অথরাইজড ব্লগার না।" })
+            return res.json({ ok: false, msg: "You are not authorised" })
 
         }
 

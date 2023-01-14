@@ -6,13 +6,15 @@ const ReportController = {
 
    getHeadingReports: async (req, res, next) => {
 
+      // consoleLog('Repoert, business', req?.store)
       try {
 
-         const businessId = req?.business?.id
+         const businessId = req?.store?.id
          const userId = req?.user?.id
 
          const date = req.query.date
          const query = req.query.query
+
 
          if (!businessId) return res.json({ ok: false })
 
@@ -127,7 +129,7 @@ const ReportController = {
    getThirtyDaySaleReport: async (req, res) => {
       try {
 
-         const businessId = req?.business?.id
+         const businessId = req?.store?.id
          const userId = req?.user?.id
          const query = req.query.query
 
@@ -208,7 +210,7 @@ const ReportController = {
    getSalesCurrentYear: async (req, res) => {
       try {
 
-         const businessId = req?.business?.id
+         const businessId = req?.store?.id
          const userId = req?.user?.id
          const query = req.query.query
 
@@ -288,7 +290,7 @@ const ReportController = {
    getSalesDue: async (req, res) => {
       try {
 
-         const businessId = req?.business?.id
+         const businessId = req?.store?.id
          const userId = req?.user?.id
          const query = req.query.query
 
@@ -327,7 +329,7 @@ const ReportController = {
    getPurchasesDue: async (req, res) => {
       try {
 
-         const businessId = req?.business?.id
+         const businessId = req?.store?.id
          const userId = req?.user?.id
          const query = req.query.query
 
@@ -366,7 +368,7 @@ const ReportController = {
    getStockAlerts: async (req, res) => {
       try {
 
-         const businessId = req?.business?.id
+         const businessId = req?.store?.id
          const userId = req?.user?.id
          const query = req.query.query
 
@@ -391,7 +393,7 @@ const ReportController = {
             }
          })
 
-         consoleLog('getStockAlert', stockedProducts)
+         // consoleLog('getStockAlert', stockedProducts)
          return res.json({ok: true, products: stockedProducts})
 
       } catch (error) {

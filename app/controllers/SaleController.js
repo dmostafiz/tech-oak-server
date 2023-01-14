@@ -8,7 +8,7 @@ const SaleController = {
             // consoleLog('sale body', req.body)
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const invoice = await req.prisma.invoice.create({
                 data: {
@@ -110,7 +110,7 @@ const SaleController = {
                 statusQuery = undefined
             }
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if (!businessId) return res.json({ ok: false })
@@ -199,7 +199,7 @@ const SaleController = {
     searchProducts: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if (!businessId) return res.json({ ok: false })
@@ -241,7 +241,7 @@ const SaleController = {
 
             const { id } = req.body
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if (!businessId) return res.json({ ok: false })
 
 

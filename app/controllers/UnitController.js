@@ -9,14 +9,14 @@ const UnitController = {
             const { name, status, shortName } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const unit = await req.prisma.unit.create({
                 data: {
                     name: name,
                     shortName: shortName,
                     status: status == 'yes' ? true : false,
-                    businessId: req?.business?.id,
+                    businessId: req?.store?.id,
                 }
             })
 
@@ -31,7 +31,7 @@ const UnitController = {
     getUnits: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
             if(!businessId) return res.json({ ok: false })
 
@@ -57,7 +57,7 @@ const UnitController = {
 
             const { id } = req.body
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
             const unit = await req.prisma.unit.findFirst({

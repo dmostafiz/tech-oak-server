@@ -7,7 +7,7 @@ const PosController = {
             // consoleLog('sale body', req.body)
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const invoice = await req.prisma.invoice.create({
                 data: {
@@ -16,7 +16,7 @@ const PosController = {
                     paymentMethod: req.body.paymentMethod,
                     customerId: req.body.customerId,
                     refNo: req.body.sku || (1000 + +(await req.prisma.invoice.count())).toString(),
-                    businessId: req.business.id,
+                    businessId: req?.store?.id,
                     totalAmount: +req.body.totalAmount,
                     paid: req.body.paymentMethod == 'credit' ? 0 : +req.body.paidAmount,
                     due: req.body.paymentMethod == 'credit' ? +req.body.paidAmount : +req.body.dueAmount,
@@ -32,7 +32,7 @@ const PosController = {
                 await req.prisma.sale.create({
                     data: {
                         customerId: req.body.customerId,
-                        businessId: req.business.id,
+                        businessId: req?.store?.id,
                         invoiceId: invoice.id,
                         productId: product.id,
                         quantity: +product.qty,
@@ -90,7 +90,7 @@ const PosController = {
             const query = req.query.query
             // consoleLog('Sales query', query)
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if(!businessId) return res.json({ ok: false })
@@ -181,7 +181,7 @@ const PosController = {
     getProducts: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
 
@@ -217,7 +217,7 @@ const PosController = {
             const expense = await req.prisma.expense.findFirst({
                 where: {
                     id: id,
-                    businessId: req?.business?.id
+                    businessId: req?.store?.id
                 },
                 // include: {
 

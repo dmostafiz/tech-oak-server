@@ -19,7 +19,7 @@ const ProfileController = {
                 data: {
                     name: name,
                     rate: rate,
-                    businessId: req?.business?.id,
+                    businessId: req?.store?.id,
                 }
             })
 

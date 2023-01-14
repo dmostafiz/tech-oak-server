@@ -47,6 +47,16 @@ const BusinessController = {
                 }
             })
 
+            const user = await req.prisma.user.update({
+                where: {
+                    id: userId
+                },
+                
+                data: {
+                    storeId: business.id
+                }
+            })
+
             consoleLog('Business created', business)
 
             return res.json({ok: true, business})

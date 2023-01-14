@@ -14,6 +14,7 @@ const reportRouter = require("./reportRouter");
 const taxdRoutes = require("./taxRoutes");
 const unitRoutes = require("./unitRoutes");
 const variationRoutes = require("./variationRoutes");
+const userRoutes = require("./userRoutes");
 
 // /* GET home page. */
 // require('./reportRouter')(router)
@@ -35,6 +36,7 @@ const indexRouter = (app) => {
   app.use('/expense', expenseRoutes)
   app.use('/pos', posRoutes)
   app.use('/profile', profileRoutes)
+  app.use('/user', userRoutes)
 }
 
 module.exports = indexRouter;

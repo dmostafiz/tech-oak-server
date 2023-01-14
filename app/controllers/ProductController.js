@@ -77,7 +77,7 @@ const ProductController = {
     getProducts: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if(!businessId) return res.json({ ok: false })
@@ -107,7 +107,7 @@ const ProductController = {
     getProductById: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if(!businessId) return res.json({ ok: false })
@@ -137,7 +137,7 @@ const ProductController = {
     searchProducts: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
 
             if(!businessId) return res.json({ ok: false })
@@ -192,7 +192,7 @@ const ProductController = {
 
             const { id } = req.body
 
-            const businessId =  req?.business?.id
+            const businessId =  req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
 

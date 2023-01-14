@@ -10,14 +10,14 @@ const categoryController = {
             const { name, status, description, subCategory, mainCategory } = req.body
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
 
             const category = await req.prisma.category.create({
                 data: {
                     name: name,
                     description: description,
                     status: status == 'yes' ? true : false,
-                    businessId: req?.business?.id,
+                    businessId: req?.store?.id,
                     isSubcategory: subCategory,
                     parentId: mainCategory,
                 }
@@ -34,7 +34,7 @@ const categoryController = {
     getCategories: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             const userId = req?.user?.id
             if(!businessId) return res.json({ ok: false })
 
@@ -60,7 +60,7 @@ const categoryController = {
     getParentCategories: async (req, res) => {
         try {
 
-            const businessId = req?.business?.id 
+            const businessId = req.store.id
             if(!businessId) return res.json({ ok: false })
 
             const categories = await req.prisma.category.findMany({
@@ -82,7 +82,7 @@ const categoryController = {
         try {
 
             const {id} = req.body 
-            const businessId = req?.business?.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
 

@@ -7,7 +7,7 @@ const SupplierController = {
     createSupplier: async (req, res) => {
         TryCatch(res, async () => {
 
-            const businessId = req.business.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
 
@@ -44,7 +44,7 @@ const SupplierController = {
 
         TryCatch(res, async () => {
 
-            const businessId = req.business.id
+            const businessId = req?.store?.id
             if(!businessId) return res.json({ ok: false })
 
             
