@@ -381,19 +381,21 @@ const ReportController = {
                   lt: 50
                }
             },
-            include: {
-               brand: true,
-               category: true,
-            }
+            // include: {
+            //    brand: true,
+            //    category: true,
+            // }
          })
 
-         const stockedProducts = products.map(product => {
+         console.log(products)
+
+         const stockedProducts = products.filter(product => {
             if(product.stock <= product.alertQuantity){
                return product
             }
          })
 
-         // consoleLog('getStockAlert', stockedProducts)
+         consoleLog('getStockAlert', stockedProducts)
          return res.json({ok: true, products: stockedProducts})
 
       } catch (error) {

@@ -24,6 +24,7 @@ module.exports = {
                     businesses: true,
                     store: true,
                     business_role: true,
+                    isPremium: true,
                     store: true
                 }
             })
@@ -46,6 +47,7 @@ module.exports = {
                 avatar: user.avatar,
                 businesses: user.businesses,
                 business_role: user.business_role,
+                isPremium: user.isPremium,
                 store: user.store,
             }
 
@@ -155,6 +157,7 @@ module.exports = {
                 email: createUser.email,
                 avatar: createUser.avatar,
                 business_role: createUser.business_role,
+                isPremium: createUser.isPremium,
             }
 
             const accessToken = jwtSignAccessToken(tokenUser, '1d')
@@ -305,6 +308,7 @@ module.exports = {
                         updatedAt: true,
                         businesses: true,
                         business_role: true,
+                        isPremium: true,
                         store: true
                     }
                 })

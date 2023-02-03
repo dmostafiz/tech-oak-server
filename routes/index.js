@@ -15,6 +15,7 @@ const taxdRoutes = require("./taxRoutes");
 const unitRoutes = require("./unitRoutes");
 const variationRoutes = require("./variationRoutes");
 const userRoutes = require("./userRoutes");
+const subscriptionRoutes = require("./subscriptionRoutes");
 
 // /* GET home page. */
 // require('./reportRouter')(router)
@@ -37,6 +38,8 @@ const indexRouter = (app) => {
   app.use('/pos', posRoutes)
   app.use('/profile', profileRoutes)
   app.use('/user', userRoutes)
+  app.use('/subscription', subscriptionRoutes)
+
 }
 
 module.exports = indexRouter;

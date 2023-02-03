@@ -31,7 +31,7 @@ const BusinessController = {
 
             const userId = req.user.id
 
-            const { name, location, contact, city, state, zip } = req.body
+            const { name, location, contact, city, state, zip, businessType } = req.body
 
             const business = await req.prisma.business.create({
                 data: {
@@ -43,7 +43,8 @@ const BusinessController = {
                     zip: zip,
                     status: true,
                     isDefault: true,
-                    adminId: userId
+                    adminId: userId,
+                    businessType: businessType
                 }
             })
 
@@ -51,7 +52,7 @@ const BusinessController = {
                 where: {
                     id: userId
                 },
-                
+
                 data: {
                     storeId: business.id
                 }
@@ -59,7 +60,7 @@ const BusinessController = {
 
             consoleLog('Business created', business)
 
-            return res.json({ok: true, business})
+            return res.json({ ok: true, business })
 
         } catch (error) {
             consoleLog('create business error', error)

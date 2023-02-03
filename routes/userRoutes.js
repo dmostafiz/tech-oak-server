@@ -8,5 +8,16 @@ router.post('/create', [authMiddleware], create)
 router.get('/get', [authMiddleware], getUsers)
 router.post('/delete', [authMiddleware], deleteUsers)
 
+router.get('/update', async (req, res) => {
+
+    const updated = await req.prisma.user.updateMany({
+        data: {
+            isPremium: false
+        }
+    })
+
+    return res.json({updated})
+})
+
 const userRoutes = router
 module.exports = userRoutes

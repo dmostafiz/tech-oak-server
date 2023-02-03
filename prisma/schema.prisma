@@ -38,6 +38,8 @@ model User {
   store   Business? @relation(name: "operation", fields: [storeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   storeId String?   @db.ObjectId
 
+  isPremium Boolean @default(false)
+
   verifiedAt DateTime?
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
@@ -79,8 +81,10 @@ model Business {
 
   invoices Invoice[]
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  // store / cantine
+  businessType String?    @default("store")
+  createdAt     DateTime? @default(now())
+  updatedAt     DateTime? @updatedAt
 }
 
 model Brand {
