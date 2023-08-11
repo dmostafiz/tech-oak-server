@@ -6,23 +6,23 @@ const ProductController = {
     create: async (req, res) => {
         try {
             // consoleLog('brand body', req.body)
-            // consoleLog('category user business', req.business)
+            consoleLog('user business', req.body.business)
 
             //    req.body
 
             // return res.status(200).json({ ok: true })
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.business) return res.json({ ok: false, msg: "Business not found!" })
+            if (!req.body.business) return res.json({ ok: false, msg: "Business not found!" })
 
-            const imageUploadResult = req.body.image ? await CloudinaryHelper.uploader.upload(req.body.image, {
-                folder: `product_images/${req?.user?.id}`,
-                format: 'webp',
-                width: 500,
-                height: 300,
-                crop: "fill",
-                quality: 75
-            }) : null
+            // const imageUploadResult = req.body.image ? await CloudinaryHelper.uploader.upload(req.body.image, {
+            //     folder: `product_images/${req?.user?.id}`,
+            //     format: 'webp',
+            //     width: 500,
+            //     height: 300,
+            //     crop: "fill",
+            //     quality: 75
+            // }) : null
 
             const product = await req.prisma.product.create({
                 data: {
@@ -38,7 +38,7 @@ const ProductController = {
 
                     categoryId: req.body.categoryId,
 
-                    businessId: req.business.id,
+                    businessId: req.body.business,
 
                     taxId: req.body.taxId,
 
@@ -46,7 +46,8 @@ const ProductController = {
 
                     description: req.body.description,
 
-                    image: imageUploadResult?.secure_url,
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJiT-UHSm6w0Jperb8SitpfoAKeMUE3uynPg5YO-2Drw&s',
+                    // imageUploadResult?.secure_url,
 
                     taxRate: +req.body.taxRate,
 
