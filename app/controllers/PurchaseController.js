@@ -6,9 +6,9 @@ const PurchaseController = {
     create: async (req, res) => {
         try {
             consoleLog('purchase body', req.body)
-     
-            if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
-            if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
+
+            if (!req.user) return res.json({ok: false, msg: "you are not authenticated!"})
+            if (!req.store) return res.json({ok: false, msg: "Business not found!"})
 
             const invoice = await req.prisma.invoice.create({
                 data: {
@@ -70,16 +70,21 @@ const PurchaseController = {
 
             consoleLog('Created invoice', getInvoice)
 
-            return res.json({ ok: true, invoice:getInvoice })
+            return res.json({ok: true, invoice: getInvoice})
 
         } catch (error) {
             consoleLog('purchase create error', error)
-            res.json({ ok: false })
+            res.json({ok: false})
         }
     },
 
     getInvoices: async (req, res) => {
+
+        console.log('Request query: ', req.query)
+        console.log('Status from request: ', req.query.status)
+
         try {
+
 
             const date = req.query.date
             const query = req.query.query
@@ -91,15 +96,14 @@ const PurchaseController = {
 
             if (status == 'paid') {
                 statusQuery = {
-                    due: {
-                        equals: 0
+                    paid: {
+                        gt: 0
                     }
                 }
-            }
-            else if (status == 'due') {
+            } else if (status == 'due') {
                 statusQuery = {
-                    paid: {
-                        equals: 0
+                    due: {
+                        gt: 0
                     }
                 }
             } else {
@@ -110,7 +114,7 @@ const PurchaseController = {
             const businessId = req?.store?.id
             const userId = req?.user?.id
 
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ok: false})
 
 
             const invoices = await req.prisma.invoice.findMany({
@@ -173,27 +177,23 @@ const PurchaseController = {
                     createdAt: 'desc'
                 },
                 include: {
+                    business: true,
                     supplier: true,
                     purchases: {
                         include: {
-                            product: {
-                                include: {
-                                    brand: true
-                                }
-                            }
+                            product: true
                         }
                     },
-                    business: true
                 }
             })
 
             // consoleLog('Business invoices', invoices)
 
-            return res.json({ ok: true, invoices })
+            return res.json({ok: true, invoices})
 
         } catch (error) {
-            consoleLog('get brands error', error)
-            res.json({ ok: false })
+            consoleLog('get invoices error', error)
+            res.json({ok: false})
         }
     },
 
@@ -202,7 +202,7 @@ const PurchaseController = {
 
             const businessId = req?.store?.id
             const userId = req?.user?.id
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ok: false})
 
 
             const query = req.params.query
@@ -213,8 +213,8 @@ const PurchaseController = {
                 where: {
                     businessId: businessId,
                     OR: [
-                        { name: { contains: query, mode: 'insensitive' } },
-                        { sku: { contains: query, mode: 'insensitive' } },
+                        {name: {contains: query, mode: 'insensitive'}},
+                        {sku: {contains: query, mode: 'insensitive'}},
                     ]
                 },
                 take: 5,
@@ -228,11 +228,11 @@ const PurchaseController = {
 
             // consoleLog('Business products', products)
 
-            return res.json({ ok: true, products })
+            return res.json({ok: true, products})
 
         } catch (error) {
             consoleLog('get brands error', error)
-            res.json({ ok: false })
+            res.json({ok: false})
         }
     },
 
@@ -240,10 +240,10 @@ const PurchaseController = {
     deleteProduct: async (req, res) => {
         try {
 
-            const { id } = req.body
+            const {id} = req.body
 
             const businessId = req?.store?.id
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ok: false})
 
 
             const product = await req.prisma.product.findFirst({
@@ -257,7 +257,6 @@ const PurchaseController = {
             })
 
 
-
             // consoleLog('Delete Category', category)
 
             const deleteProduct = await req.prisma.product.delete({
@@ -266,11 +265,11 @@ const PurchaseController = {
                 }
             })
 
-            res.json({ ok: true })
+            res.json({ok: true})
 
         } catch (error) {
             consoleLog('Product Delete Error', error)
-            res.json({ ok: false })
+            res.json({ok: false})
         }
     }
 }

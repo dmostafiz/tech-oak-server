@@ -25,7 +25,6 @@ module.exports = {
                     store: true,
                     business_role: true,
                     isPremium: true,
-                    store: true
                 }
             })
 

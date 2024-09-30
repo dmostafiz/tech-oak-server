@@ -100,15 +100,15 @@ const SaleController = {
 
             if (status == 'paid') {
                 statusQuery = {
-                    due: {
-                        equals: 0
+                    paid: {
+                        gt: 0
                     }
                 }
             }
             else if (status == 'due') {
                 statusQuery = {
-                    paid: {
-                        equals: 0
+                    due: {
+                        gt: 0
                     }
                 }
             } else {
@@ -117,6 +117,8 @@ const SaleController = {
 
             const businessId = req?.store?.id
             const userId = req?.user?.id
+
+            console.log('business id', businessId)
 
             if (!businessId) return res.json({ ok: false })
 
