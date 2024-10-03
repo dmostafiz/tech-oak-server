@@ -66,6 +66,44 @@ const BusinessController = {
             consoleLog('create business error', error)
             res.json({ ok: false })
         }
+    },
+
+    updateOwnerBusinesses: async (req, res) => {
+
+        try {
+
+            const userId = req.user.id
+
+            consoleLog('Store user ID: ', userId)
+
+            const { id, name, location, contact, city, state, zip, businessType } = req.body
+
+            const business = await req.prisma.business.update({
+                where: {
+                    id: id,
+                    // adminId: userId
+                },
+
+                data: {
+                    name: name,
+                    phone: contact,
+                    location: location,
+                    city: city,
+                    state: state,
+                    zip: zip,
+                    businessType: businessType
+                }
+            })
+
+
+            consoleLog('Business updated', business)
+
+            return res.json({ ok: true, business })
+
+        } catch (error) {
+            consoleLog('update business error', error)
+            res.json({ ok: false })
+        }
     }
 }
 

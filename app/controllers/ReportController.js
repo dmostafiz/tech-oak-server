@@ -308,6 +308,7 @@ const ReportController = {
             include: {
                business: true,
                customer: true,
+               user:true,
                sales: {
                   include: {
                      product: true
@@ -402,6 +403,252 @@ const ReportController = {
          // consoleLog('getThirtyDaySaleReport error', error)
          return res.json({ ok: false })
       }
+   },
+
+   profites: async (req, res) => {
+
+      try {
+
+         const date = req.query.date
+         const query = req.query.query
+         const cashier = req.query.cashier
+
+         console.log('Cashier query', req.query)
+
+ 
+
+         var cashierQuery
+
+         if(cashier){
+             cashierQuery = {
+                 userId: cashier
+             }
+         }else{
+             cashierQuery = undefined
+         }
+
+         const businessId = req?.store?.id
+         const userId = req?.user?.id
+
+         console.log('Sales business id', businessId)
+
+         if (!businessId) return res.json({ ok: false })
+
+
+         const sales = await req.prisma.sale.findMany({
+             where: {
+                 businessId: businessId,
+                 isReturn: false,
+                 createdAt: {
+                     gte: new Date(date[0]),
+                     lte: new Date(date[1]),
+                 },
+
+                 OR: [
+                     {
+                         invoice: {
+                             refNo: query
+                         }
+                     },
+
+                     {
+                        product: {
+                            name: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        }
+                    },
+
+                     {
+                        customer: {
+                            firstName: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        }
+                    },
+
+                     {
+                         customer: {
+                             lastName: {
+                                 contains: query,
+                                 mode: 'insensitive'
+                             }
+                         }
+                     },
+
+                     {
+                         customer: {
+                             email: {
+                                 contains: query,
+                                 mode: 'insensitive'
+                             }
+                         }
+                     },
+
+                     {
+                         customer: {
+                             mobile: {
+                                 contains: query,
+                                 mode: 'insensitive'
+                             }
+                         }
+                     },
+                 ],
+                 ...cashierQuery
+             },
+             orderBy: {
+                 createdAt: 'desc'
+             },
+             include: {
+                 customer: true,
+                 user:true,
+                 product: true,
+                 invoice: {
+                  include:{
+                     sales: {
+                        include: {
+                           product: true
+                        }
+                     }
+                  }
+                 }
+             }
+         })
+
+         // consoleLog('Business invoices', invoices)
+
+         return res.json({ ok: true, sales })
+
+     } catch (error) {
+         consoleLog('get sales error', error)
+         res.json({ ok: false })
+     }
+
+   },
+
+   returns: async (req, res) => {
+
+      try {
+
+         const date = req.query.date
+         const query = req.query.query
+         const cashier = req.query.cashier
+
+         console.log('Cashier query', req.query)
+
+ 
+
+         var cashierQuery
+
+         if(cashier){
+             cashierQuery = {
+                 userId: cashier
+             }
+         }else{
+             cashierQuery = undefined
+         }
+
+         const businessId = req?.store?.id
+         const userId = req?.user?.id
+
+         console.log('Sales business id', businessId)
+
+         if (!businessId) return res.json({ ok: false })
+
+
+         const sales = await req.prisma.sale.findMany({
+             where: {
+                 businessId: businessId,
+                 isReturn: true,
+                 createdAt: {
+                     gte: new Date(date[0]),
+                     lte: new Date(date[1]),
+                 },
+
+                 OR: [
+                     {
+                         invoice: {
+                             refNo: query
+                         }
+                     },
+
+                     {
+                        product: {
+                            name: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        }
+                    },
+
+                     {
+                        customer: {
+                            firstName: {
+                                contains: query,
+                                mode: 'insensitive'
+                            }
+                        }
+                    },
+
+                     {
+                         customer: {
+                             lastName: {
+                                 contains: query,
+                                 mode: 'insensitive'
+                             }
+                         }
+                     },
+
+                     {
+                         customer: {
+                             email: {
+                                 contains: query,
+                                 mode: 'insensitive'
+                             }
+                         }
+                     },
+
+                     {
+                         customer: {
+                             mobile: {
+                                 contains: query,
+                                 mode: 'insensitive'
+                             }
+                         }
+                     },
+                 ],
+                 ...cashierQuery
+             },
+             orderBy: {
+                 createdAt: 'desc'
+             },
+             include: {
+                 customer: true,
+                 user:true,
+                 product: true,
+                 invoice: {
+                  include:{
+                     sales: {
+                        include: {
+                           product: true
+                        }
+                     }
+                  }
+                 }
+             }
+         })
+
+         // consoleLog('Business invoices', invoices)
+
+         return res.json({ ok: true, sales })
+
+     } catch (error) {
+         consoleLog('get sales error', error)
+         res.json({ ok: false })
+     }
+
    }
 
 }

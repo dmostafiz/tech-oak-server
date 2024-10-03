@@ -15,6 +15,7 @@ const SaleController = {
                 data: {
                     type: 'sale',
                     saleType: 'sale',
+                    userId: req.user.id,
                     customerId: req.body.customerId,
                     refNo: req.body.sku || (1000 + +(await req.prisma.invoice.count())).toString(),
                     businessId: req.store.id,
@@ -39,6 +40,7 @@ const SaleController = {
                         customerId: req.body.customerId,
                         businessId: req.store.id,
                         invoiceId: invoice.id,
+                        userId: req.user.id,
                         productId: product.id,
                         quantity: +product.qty,
                         unitPrice: product.purchasePrice,
@@ -94,7 +96,9 @@ const SaleController = {
             const date = req.query.date
             const query = req.query.query
             const status = req.query.status
-            // consoleLog('Sales query', query)
+            const cashier = req.query.cashier
+
+            console.log('Cashier query', req.query)
 
             var statusQuery
 
@@ -113,6 +117,16 @@ const SaleController = {
                 }
             } else {
                 statusQuery = undefined
+            }
+
+            var cashierQuery
+
+            if(cashier){
+                cashierQuery = {
+                    userId: cashier
+                }
+            }else{
+                cashierQuery = undefined
             }
 
             const businessId = req?.store?.id
@@ -177,15 +191,18 @@ const SaleController = {
                         },
                     ],
 
-                    ...statusQuery
+                    ...statusQuery,
+                    ...cashierQuery
                 },
                 orderBy: {
                     createdAt: 'desc'
                 },
                 include: {
                     customer: true,
+                    user:true,
                     sales: {
                         include: {
+                            user:true,
                             product: true
                         }
                     },

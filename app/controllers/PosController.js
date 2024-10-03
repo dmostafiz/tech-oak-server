@@ -4,7 +4,7 @@ const PosController = {
 
     create: async (req, res) => {
         try {
-            // consoleLog('sale body', req.body)
+            consoleLog('sale body', req.user)
 
             if (!req.user) return res.json({ ok: false, msg: "you are not authenticated!" })
             if (!req.store) return res.json({ ok: false, msg: "Business not found!" })
@@ -14,6 +14,7 @@ const PosController = {
                     type: 'sale',
                     saleType: 'pos',
                     paymentMethod: req.body.paymentMethod,
+                    userId: req.user.id,
                     customerId: req.body.customerId,
                     refNo: req.body.sku || (1000 + +(await req.prisma.invoice.count())).toString(),
                     businessId: req?.store?.id,
@@ -35,6 +36,7 @@ const PosController = {
                         businessId: req?.store?.id,
                         invoiceId: invoice.id,
                         productId: product.id,
+                        userId: req.user.id,
                         quantity: +product.qty,
                         unitPrice: product.purchasePrice,
                         total: product.purchasePrice * product.qty,
@@ -159,8 +161,10 @@ const PosController = {
                 },
                 include: {
                     customer: true,
+                    user: true,
                     sales: {
                         include: {
+                            user: true,
                             product: true
                         }
                     },

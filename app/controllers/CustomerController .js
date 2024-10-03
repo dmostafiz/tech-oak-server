@@ -8,7 +8,7 @@ const CustomerController = {
         TryCatch(res, async () => {
 
             const businessId = req?.store?.id
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ ok: false })
 
             const customer = await req.prisma.customer.create({
                 data: {
@@ -41,15 +41,46 @@ const CustomerController = {
 
     getCustomers: async (req, res) => {
 
+        consoleLog('customer query', req.query.query)
+
+        const customerQuery = req.query.query
+
+
         TryCatch(res, async () => {
 
             const businessId = req?.store?.id
-            if(!businessId) return res.json({ ok: false })
+            if (!businessId) return res.json({ ok: false })
 
             const customers = await req.prisma.customer.findMany({
                 where: {
                     businessId: businessId,
-                    status: true
+                    status: true,
+                    OR: [
+                        {
+                            firstName: {
+                                contains: customerQuery,
+                                mode: 'insensitive'
+                            }
+                        },
+                        {
+                            lastName: {
+                                contains: customerQuery,
+                                mode: 'insensitive'
+                            }
+                        },
+                        {
+                            email: {
+                                contains: customerQuery,
+                                mode: 'insensitive'
+                            }
+                        },
+                        {
+                            mobile: {
+                                contains: customerQuery,
+                                mode: 'insensitive'
+                            }
+                        },
+                    ]
                 },
 
                 include: {

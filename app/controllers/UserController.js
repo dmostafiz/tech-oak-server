@@ -7,11 +7,8 @@ const userController = {
 
     create: async (req, res) => {
 
-        const { email, firstName, lastName } = req.body
+        const { email, firstName, lastName, password } = req.body
 
-
-        const password = randomId(20, 'aA0')
-        consoleLog('Generated password', password)
 
         const hashedPassword = bcrypt.hashSync(password, 12);
         consoleLog('Hashed password', hashedPassword)
@@ -87,6 +84,10 @@ const userController = {
                         not: userId
                     },
                     storeId: businessId,
+                },
+                include:{
+                    invoices: true,
+                    sales: true
                 }
             })
 
