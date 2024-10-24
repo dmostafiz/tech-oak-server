@@ -43,7 +43,34 @@ const CustomerController = {
 
         consoleLog('customer query', req.query.query)
 
-        const customerQuery = req.query.query
+        const customerQuery = req.query.query ? {
+            OR: [
+                {
+                    firstName: {
+                        contains: req.query.query,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    lastName: {
+                        contains: req.query.query,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    email: {
+                        contains: req.query.query,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    mobile: {
+                        contains: req.query.query,
+                        mode: 'insensitive'
+                    }
+                },
+            ]
+        } : undefined
 
 
         TryCatch(res, async () => {
@@ -55,32 +82,7 @@ const CustomerController = {
                 where: {
                     businessId: businessId,
                     status: true,
-                    OR: [
-                        {
-                            firstName: {
-                                contains: customerQuery,
-                                mode: 'insensitive'
-                            }
-                        },
-                        {
-                            lastName: {
-                                contains: customerQuery,
-                                mode: 'insensitive'
-                            }
-                        },
-                        {
-                            email: {
-                                contains: customerQuery,
-                                mode: 'insensitive'
-                            }
-                        },
-                        {
-                            mobile: {
-                                contains: customerQuery,
-                                mode: 'insensitive'
-                            }
-                        },
-                    ]
+                    ...customerQuery
                 },
 
                 include: {
